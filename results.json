@@ -1,0 +1,48 @@
+{
+  "generated": "2026-10-06",
+  "runs": 30,
+  "days_evaluated": 90,
+  "medicines": 10,
+  "threshold": {
+    "wastage_pct": {
+      "mean": 0.23,
+      "std": 0.21
+    },
+    "stockout_day_pct": {
+      "mean": 0.44,
+      "std": 0.28
+    },
+    "fill_rate_pct": {
+      "mean": 99.58,
+      "std": 0.39
+    },
+    "avg_inventory_units": {
+      "mean": 706.82,
+      "std": 18.43
+    }
+  },
+  "smartrx": {
+    "wastage_pct": {
+      "mean": 0.11,
+      "std": 0.13
+    },
+    "stockout_day_pct": {
+      "mean": 0.34,
+      "std": 0.17
+    },
+    "fill_rate_pct": {
+      "mean": 99.75,
+      "std": 0.2
+    },
+    "avg_inventory_units": {
+      "mean": 487.43,
+      "std": 31.82
+    }
+  },
+  "smartrx_better_in_runs_pct": {
+    "wastage_pct": 63,
+    "stockout_day_pct": 50,
+    "fill_rate_pct": 53,
+    "avg_inventory_units": 100
+  }
+}

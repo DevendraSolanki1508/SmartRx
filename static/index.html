@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SmartRx Console</title>
+<style>
+:root{--bg:#f3f5f5;--sf:#fff;--bd:#dde3e3;--tx:#12202a;--mu:#5f6f78;--ac:#0f766e;--ab:#e2f3f0;--wn:#9a5b06;--wb:#fdf0d9;--dg:#b3261e;--db:#fce8e6;--ok:#2f6f3e;--ob:#e6f3e9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1619;--sf:#162226;--bd:#27373c;--tx:#e6eeee;--mu:#93a6ab;--ac:#4fd1c0;--ab:#143a38;--wn:#f0b45a;--wb:#3a2c12;--dg:#f28b82;--db:#3d1b19;--ok:#7fd093;--ob:#17321e}}
+:root[data-theme="dark"]{--bg:#0e1619;--sf:#162226;--bd:#27373c;--tx:#e6eeee;--mu:#93a6ab;--ac:#4fd1c0;--ab:#143a38;--wn:#f0b45a;--wb:#3a2c12;--dg:#f28b82;--db:#3d1b19;--ok:#7fd093;--ob:#17321e}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--sf);border-bottom:1px solid var(--bd)}
+h1{font-size:18px;margin:0;font-weight:600}h1 span{color:var(--ac)}h2{font-size:15px;margin:0;font-weight:600}
+.sub{color:var(--mu);font-size:12px}main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;display:grid;gap:16px}
+.row{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+.kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;min-width:0}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.k b{display:block;font-size:26px;font-weight:600;line-height:1.1}.k span{color:var(--mu);font-size:12px}.k{border-left:3px solid var(--bd)}
+.k.w{border-left-color:var(--wn)}.k.d{border-left-color:var(--dg)}.k.a{border-left-color:var(--ac)}
+.tg{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;white-space:nowrap}
+.tg.d{background:var(--db);color:var(--dg)}.tg.w{background:var(--wb);color:var(--wn)}.tg.o{background:var(--ob);color:var(--ok)}.tg.a{background:var(--ab);color:var(--ac)}
+.al{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--bd);align-items:flex-start}.al:first-of-type{border-top:0}.al div{flex:1;min-width:0}
+.sc{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;font-weight:500;color:var(--mu);padding:6px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}td{padding:7px 8px;border-bottom:1px solid var(--bd);white-space:nowrap}
+tr:last-child td{border-bottom:0}.r{text-align:right}
+input,select,button{font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:6px 10px}
+button{cursor:pointer}button.p{background:var(--ac);border-color:var(--ac);color:var(--sf)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.po{border-top:1px solid var(--bd);padding:10px 0}.po:first-of-type{border-top:0}.po p{margin:2px 0;color:var(--mu);font-size:12px}.po .b{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.sh{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.sh .card{padding:10px 12px}.sh b{font-size:20px;font-weight:600}
+svg{width:100%;height:auto;display:block}.ax{fill:var(--mu);font-size:10px}
+.bar{height:8px;border-radius:4px;background:var(--bd);margin:3px 0 8px}.bar i{display:block;height:100%;border-radius:4px}
+.lg{font-size:12px;color:var(--mu);display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.log{max-height:190px;overflow-y:auto;font-size:12px}.log div{padding:4px 0;border-top:1px solid var(--bd);display:flex;gap:10px}.log time{color:var(--mu);min-width:48px}
+</style></head><body>
+<header><div><h1>Smart<span>Rx</span> console</h1><div class="sub" id="today"></div></div>
+<div class="sub" id="conn"></div></header>
+<main>
+<section class="kpis" id="kpis" aria-label="Key figures"></section>
+<div class="row">
+<section class="card"><div class="hd"><h2>Alerts</h2><span class="sub" id="acount"></span></div><div id="alerts"></div></section>
+<section class="card"><div class="hd"><h2>Purchase orders awaiting approval</h2><button class="p" id="gen" hidden>Run reorder agent</button></div><div id="pos"></div></section>
+</div>
+<section class="card"><div class="hd"><h2>Inventory by batch (earliest expiry first)</h2>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="q" placeholder="Search medicine or batch" aria-label="Search"><select id="f" aria-label="Filter"><option value="">All batches</option><option>Expired</option><option>Expiring soon</option><option>Cold-chain breach</option></select></div></div>
+<div class="sc"><table><thead><tr><th>Medicine</th><th>Batch</th><th>Expiry</th><th class="r">Days left</th><th class="r">Units</th><th>Shelf</th><th>Status</th></tr></thead><tbody id="inv"></tbody></table></div></section>
+<section class="card"><div class="hd"><h2>Smart shelves, live sensors</h2><button id="sim" hidden>Simulate heat event on C1</button></div><div class="sh" id="shelves"></div></section>
+<div class="row">
+<section class="card"><div class="hd"><h2>Cold storage C1, last 24 hours</h2><span class="tg d" id="tbadge"></span></div><div id="tchart"></div><div class="lg"><span><i style="background:var(--ab)"></i>Safe range 2 to 8 °C</span><span><i style="background:var(--dg)"></i>Excursion</span></div></section>
+<section class="card"><div class="hd"><h2>Demand forecast</h2><select id="fm" aria-label="Medicine"></select></div><div id="fchart"></div><div class="lg" id="fnote"></div></section>
+</div>
+<div class="row">
+<section class="card"><div class="hd"><h2>SmartRx vs threshold reordering</h2><span class="tg a" id="evb"></span></div><div id="cmp"></div><div class="sub" id="evn"></div></section>
+<section class="card"><div class="hd"><h2>Audit log</h2></div><div class="log" id="log"></div></section>
+</div>
+</main>
+<script>
+var DAY=864e5,now=new Date(),$=function(i){return document.getElementById(i)};
+var EV={"generated": "2026-10-06", "runs": 30, "days_evaluated": 90, "medicines": 10, "threshold": {"wastage_pct": {"mean": 0.23, "std": 0.21}, "stockout_day_pct": {"mean": 0.44, "std": 0.28}, "fill_rate_pct": {"mean": 99.58, "std": 0.39}, "avg_inventory_units": {"mean": 706.82, "std": 18.43}}, "smartrx": {"wastage_pct": {"mean": 0.11, "std": 0.13}, "stockout_day_pct": {"mean": 0.34, "std": 0.17}, "fill_rate_pct": {"mean": 99.75, "std": 0.2}, "avg_inventory_units": {"mean": 487.43, "std": 31.82}}, "smartrx_better_in_runs_pct": {"wastage_pct": 63, "stockout_day_pct": 50, "fill_rate_pct": 53, "avg_inventory_units": 100}};
+var API=new URLSearchParams(location.search).get("api")||"",LIVE=false,MID=[],TS=null;
+function J(u){return fetch(API+u).then(function(r){if(!r.ok)throw 0;return r.json()})}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function bad(s){return s[7]!==undefined?s[7]:(s[4]>8&&s[0]=="C1")}
+var M=[["Insulin glargine","100 IU/mL","C1",20],["Hepatitis B vaccine","20 mcg","C1",10],["Amoxicillin","500 mg","R1",60],["Paracetamol","650 mg","R1",100],["Cetirizine","10 mg","R2",40],["Metformin","500 mg","R2",50],["Pantoprazole","40 mg","R2",30],["Azithromycin","500 mg","R1",40]];
+var B=[[0,"IG-2407",14,6],[0,"IG-2501",200,18],[1,"HB-0311",60,9],[2,"AX-118",-4,12],[2,"AX-205",120,140],[3,"PC-077",25,80],[3,"PC-091",300,400],[4,"CT-044",22,95],[5,"MF-031",180,35],[6,"PN-012",90,22],[7,"AZ-009",45,60]];
+var S=[["C1","Cold store",1240,25,9.1,52,"Closed"],["R1","Room shelf A",8420,632,24.6,48,"Closed"],["R2","Room shelf B",3110,152,25.2,50,"Open"]];
+var P=[{id:"PO-2026-0148",sup:"MedLine Distributors",it:[["Pantoprazole 40 mg",60,4.2],["Metformin 500 mg",80,1.9]],why:"Forecast 7-day demand 74, lead time 2 days, safety stock 12. Current stock 57."},{id:"PO-2026-0149",sup:"CoolChain Pharma",it:[["Hepatitis B vaccine 20 mcg",20,310]],why:"Stock 9 is below demand over the 3-day lead time. Cold-chain supplier."},{id:"PO-2026-0150",sup:"MedLine Distributors",it:[["Insulin glargine 100 IU/mL",30,615]],why:"Batch IG-2407 expires in 14 days; forecast covers 5 of its 6 units."}];
+var logs=[["08:02","System","Shelf C1 temperature 9.1 °C, above 8 °C limit"],["07:40","System","Batch AX-118 marked expired, removed from FEFO"],["07:15","Dispense","3 x Paracetamol 650 mg from PC-077 (FEFO)"],["06:50","System","Purchase orders drafted by reorder agent"]];
+function dl(d){var x=new Date(now.getTime()+d*DAY);return x.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}
+function tot(i){return B.filter(function(b){return b[0]==i&&b[2]>=0}).reduce(function(s,b){return s+b[3]},0)}
+function st(b){var s=[];if(b[2]<0)s.push(["Expired","d"]);else if(b[2]<=30)s.push(["Expiring soon","w"]);else s.push(["In date","o"]);if(b[4]!==undefined?b[4]>0:M[b[0]][2]=="C1")s.push(["Cold-chain breach","d"]);return s}
+function run(){$("gen").hidden=!LIVE;$("sim").hidden=!LIVE;$("gen").onclick=function(){fetch(API+"/purchase-orders/generate",{method:"POST"}).then(init)};$("sim").onclick=function(){fetch(API+"/readings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({shelf_id:"C1",weight_g:1240,temp_c:9.8,humidity:55,door_open:true})}).then(init)};$("today").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+$("conn").innerHTML=LIVE?'<span class="tg o">Connected to backend</span> '+S.length+' shelves reporting':'<span class="tg w">Demo data</span> Backend not reachable';
+var exp=B.filter(function(b){return b[2]<0}),near=B.filter(function(b){return b[2]>=0&&b[2]<=30}),low=M.map(function(m,i){return[i,tot(i)]}).filter(function(x){return x[1]<M[x[0]][3]});
+var kp=[["Units in stock",B.reduce(function(s,b){return s+(b[2]>=0?b[3]:0)},0).toLocaleString(),"a","Excludes expired"],["Expiring within 30 days",near.length,"w","Batches"],["Expired batches",exp.length,"d","Remove from shelf"],["Below reorder level",low.length,"w","Medicines"],["Temperature breaches",S.filter(bad).length,"d","Shelves"],["Orders pending",P.filter(function(p){return!p.st}).length,"a","Need approval"]];
+$("kpis").innerHTML=kp.map(function(k){return'<div class="card k '+k[2]+'"><b>'+k[1]+'</b>'+k[0]+'<br><span>'+k[3]+'</span></div>'}).join("");
+var A=[];exp.forEach(function(b){A.push(["d","Expired",M[b[0]][0]+" batch "+b[1]+", "+b[3]+" units. Remove and return to supplier."])});
+S.filter(bad).forEach(function(s){A.push(["d","Cold-chain","Shelf "+s[0]+" had readings outside the safe temperature range. Review batches on this shelf."])});
+near.forEach(function(b){A.push(["w","Expiring",M[b[0]][0]+" batch "+b[1]+" expires in "+b[2]+" days, "+b[3]+" units. Sell first or return."])});
+low.forEach(function(x){A.push(["w","Low stock",M[x[0]][0]+": "+x[1]+" units, reorder level "+M[x[0]][3]+"."])});
+$("acount").textContent=A.length+" open";
+$("alerts").innerHTML=A.map(function(a){return'<div class="al"><span class="tg '+a[0]+'">'+a[1]+'</span><div>'+a[2]+'</div></div>'}).join("");
+function inv(){var q=$("q").value.toLowerCase(),f=$("f").value;$("inv").innerHTML=B.slice().sort(function(a,b){return a[0]-b[0]||a[2]-b[2]}).filter(function(b){var s=st(b).map(function(x){return x[0]});return(!q||(M[b[0]][0]+b[1]).toLowerCase().indexOf(q)>-1)&&(!f||s.indexOf(f)>-1)}).map(function(b){return'<tr><td>'+M[b[0]][0]+' <span class="sub">'+M[b[0]][1]+'</span></td><td>'+b[1]+'</td><td>'+dl(b[2])+'</td><td class="r">'+b[2]+'</td><td class="r">'+b[3]+'</td><td>'+M[b[0]][2]+'</td><td>'+st(b).map(function(x){return'<span class="tg '+x[1]+'">'+x[0]+'</span>'}).join(" ")+'</td></tr>'}).join("")||'<tr><td colspan="7" class="sub">No batches match this filter.</td></tr>'}
+$("q").oninput=inv;$("f").onchange=inv;inv();
+$("shelves").innerHTML=S.map(function(s){var bd=bad(s);return'<div class="card"><div class="hd" style="margin:0 0 6px"><b style="font-size:14px">'+s[0]+' '+s[1]+'</b><span class="tg '+(bd?"d":"o")+'">'+(bd?"Breach":"Normal")+'</span></div><b>'+s[3]+'</b> units<div class="sub">'+s[2].toLocaleString()+' g on load cells</div><div class="sub">'+s[4]+' °C, door '+s[6].toLowerCase()+'</div></div>'}).join("");
+function line(v,o){var w=600,h=o.h||190,l=34,r=8,t=10,b=20,mn=o.mn,mx=o.mx,X=function(i){return l+i*(w-l-r)/(v.length-1)},Y=function(y){return t+(mx-y)*(h-t-b)/(mx-mn)},s='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+o.a+'">';
+for(var g=0;g<=3;g++){var yy=mn+g*(mx-mn)/3;s+='<line x1="'+l+'" x2="'+(w-r)+'" y1="'+Y(yy)+'" y2="'+Y(yy)+'" stroke="var(--bd)"/><text class="ax" x="2" y="'+(Y(yy)+3)+'">'+Math.round(yy)+'</text>'}
+if(o.band)s+='<rect x="'+l+'" y="'+Y(o.band[1])+'" width="'+(w-l-r)+'" height="'+(Y(o.band[0])-Y(o.band[1]))+'" fill="var(--ab)"/>';
+if(o.fi){s+='<rect x="'+X(o.fi)+'" y="'+t+'" width="'+(w-r-X(o.fi))+'" height="'+(h-t-b)+'" fill="var(--bd)" opacity=".35"/>'}
+s+='<polyline fill="none" stroke="var(--ac)" stroke-width="2" points="'+v.map(function(y,i){return X(i)+","+Y(y)}).join(" ")+'"'+(o.fi?"":"")+'/>';
+if(o.band)v.forEach(function(y,i){if(y>o.band[1]||y<o.band[0])s+='<circle cx="'+X(i)+'" cy="'+Y(y)+'" r="3.5" fill="var(--dg)"/>'});
+o.xl.forEach(function(x){s+='<text class="ax" x="'+X(x[0])+'" y="'+(h-4)+'" text-anchor="middle">'+x[1]+'</text>'});return s+(o.extra?o.extra(X,Y):"")+'</svg>'}
+var T=TS||[];if(!T.length&&!LIVE)for(var i=0;i<48;i++)T.push(+(4.6+Math.sin(i/5)*0.9+(i>=36&&i<=39?[3.6,4.5,3.9,2.4][i-36]:0)).toFixed(1));
+$("tchart").innerHTML=T.length<2?'<div class="sub">No readings yet for shelf C1.</div>':line(T,{mn:0,mx:12,band:[2,8],a:"Temperature of cold storage C1 over 24 hours with a breach near the end",xl:[[0,"24 h ago"],[16,"16 h"],[32,"8 h"],[47,"Now"]]});
+$("tbadge").textContent=T.length?"Peak "+Math.max.apply(null,T)+" °C":"No data";
+var fv=$("fm").value||0;$("fm").innerHTML=M.map(function(m,i){return'<option value="'+i+'">'+m[0]+'</option>'}).join("");$("fm").value=fv;
+function fc(){var i=+$("fm").value;if(LIVE){J("/forecast/"+MID[i]).then(function(j){dr(i,j.history.concat(j.forecast))});return}var d=[4,3,12,15,9,10,8,7][i%8],v=[],k;for(k=0;k<28;k++)v.push(+(d*(1+0.25*Math.sin(k*0.9+i))*(k>13?1.06:1)).toFixed(1));dr(i,v)}
+function dr(i,v){var k,f7=Math.round(v.slice(14,21).reduce(function(a,b){return a+b},0)),s=tot(i),run=0,so=-1;for(k=14;k<28;k++){run+=v[k];if(so<0&&run>s)so=k-13}
+$("fchart").innerHTML=line(v,{mn:0,mx:Math.ceil(Math.max.apply(null,v)/5)*5+5,fi:14,a:"Daily demand history for 14 days and forecast for the next 14 days",xl:[[0,"14 d ago"],[14,"Today"],[27,"+14 d"]]});
+$("fnote").innerHTML='<span>Shaded area is forecast</span><span>Next 7 days: '+f7+' units</span><span>Stock '+s+' units</span><span class="tg '+(so>0?"d":"o")+'">'+(so>0?"Predicted stockout in "+so+" days":"Covered for 14 days")+'</span>'}
+$("fm").onchange=fc;fc();
+$("evb").textContent="Simulation, "+EV.runs+" runs";$("evn").textContent="Simulated "+EV.medicines+" medicines over "+EV.days_evaluated+" days. Both policies see identical demand, and the threshold rule is tuned on the true average demand. Expiry and stockout gains are small and vary between runs; the cut in stock held is consistent.";
+$("cmp").innerHTML=[["Expired stock, % of units received",EV.threshold.wastage_pct.mean,EV.smartrx.wastage_pct.mean],["Days with a stockout, % of medicine-days",EV.threshold.stockout_day_pct.mean,EV.smartrx.stockout_day_pct.mean],["Average stock held, units",EV.threshold.avg_inventory_units.mean,EV.smartrx.avg_inventory_units.mean]].map(function(c){var m=Math.max(c[1],c[2]);return'<div>'+c[0]+' <span class="sub">threshold '+c[1]+', SmartRx '+c[2]+'</span></div><div class="bar"><i style="width:'+c[1]/m*100+'%;background:var(--gr,#9aa3af)"></i></div><div class="bar"><i style="width:'+c[2]/m*100+'%;background:var(--ac)"></i></div>'}).join("")+'<div class="lg"><span><i style="background:#9aa3af"></i>Threshold rule</span><span><i style="background:var(--ac)"></i>SmartRx</span></div>';
+function pos(){$("pos").innerHTML=P.map(function(p,n){var t=p.it.reduce(function(s,x){return s+x[1]*x[2]},0);return'<div class="po"><div class="hd" style="margin:0"><b>'+p.id+'</b><span class="tg '+(p.st=="Approved"?"o":p.st?"d":"a")+'">'+(p.st||"Awaiting approval")+'</span></div><div>'+p.sup+'</div>'+p.it.map(function(x){return'<p>'+x[0]+', '+x[1]+' units at Rs '+x[2]+'</p>'}).join("")+'<p>'+p.why+'</p><div><b>Total Rs '+t.toLocaleString()+'</b></div>'+(p.st?"":'<div class="b"><button class="p" onclick="act('+n+',\'Approved\')">Approve and send</button><button onclick="act('+n+',\'Rejected\')">Reject</button></div>')+'</div>'}).join("")}
+function act(n,s){if(LIVE){fetch(API+"/purchase-orders/"+P[n].pid+"/"+(s=="Approved"?"approve":"reject"),{method:"POST"}).then(init);return}P[n].st=s;var t=new Date().toTimeString().slice(0,5);logs.unshift([t,"Pharmacist",s+" "+P[n].id+(s=="Approved"?", sent to "+P[n].sup:"")]);pos();lg();var c=P.filter(function(p){return!p.st}).length;document.querySelectorAll(".k b")[5].textContent=c}
+function lg(){$("log").innerHTML=logs.map(function(l){return'<div><time>'+l[0]+'</time><span><b>'+l[1]+'</b> '+l[2]+'</span></div>'}).join("")}
+pos();lg();window.act=act}
+function init(){Promise.all([J("/medicines"),J("/batches"),J("/shelves"),J("/purchase-orders"),J("/audit"),J("/readings?shelf_id=C1&limit=48"),J("/evaluation").catch(function(){return null})]).then(function(a){
+var id={};MID=a[0].map(function(m,i){id[m.id]=i;return m.id});
+M=a[0].map(function(m){return[m.name,m.strength,m.shelf||"-",m.reorder_min]});
+B=a[1].map(function(b){return[id[b.medicine_id],b.batch_no,b.days_left,b.qty,b.excursion_count]});
+var ex={};a[1].forEach(function(b){if(b.excursion_count>0)ex[b.shelf_id]=1});
+S=a[2].map(function(s){return[s.shelf_id,"Shelf "+s.shelf_id,s.weight_g||0,s.estimated_units||0,s.temp_c==null?0:s.temp_c,s.humidity||0,s.door_open?"Open":"Closed",s.excursion||!!ex[s.shelf_id]]});
+P=a[3].map(function(p){return{id:p.po_no,pid:p.id,sup:p.supplier,it:p.items.map(function(x){return[x.name,x.qty,x.unit_price]}),why:p.rationale,st:p.status=="pending"?undefined:cap(p.status)}});
+logs=a[4].map(function(l){return[l.ts.slice(11,16),l.actor,l.message]});
+TS=a[5];if(a[6])EV=a[6];LIVE=true;run();if(!window.tmr)window.tmr=setInterval(init,10000)}).catch(function(){LIVE=false;run()})}
+init();
+</script></body></html>
